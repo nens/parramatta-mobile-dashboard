@@ -69,6 +69,13 @@ De functionaliteit is beperkt. Elke tile is gekoppeld aan een opgeslagen
 favourite in Lizard. In de fullscreen versie van een tile
 is altijd een button "To Lizard", die leidt naar de favourite in Lizard.
 
+De tiles staan op een smal scherm (zoals een telefoon) onder elkaar,
+maar als het scherm breder is dan wordt de ruimte dynamisch opgevuld
+door meerdere tiles naast elkaar te zetten, zoals op de bestaande
+Klimaatatlas site:
+
+![Klimaatatlas layout](design/MultipleTiles.png)
+
 Er zijn enkele verschillende soorten informatie, die hun eigen tiles
 gaan krijgen:
 
@@ -124,8 +131,9 @@ Gebruikt UTFGrid.
 
 ![Timeserie](design/Timeseries.png)
 
-Laat een kleine versie van de grafiek zien in de tile, van de
-afgelopen 24 uur.
+Laat een kleine versie van de grafiek zien in de tile, van een vaste
+periode, bijvoorbeeld de laatste en komende 24 uur (exacte tijd kunnen
+we later nog vaststellen).
 
 De fullscreen versie is de grafiek van de timeserie, deze kan in de
 tijd verschoven worden, gezoomd, en er is een legenda (zelfde UI
@@ -153,14 +161,14 @@ WE NEMEN AAN DAT DE BACKEND EN API HIERVAN BUITEN DEZE PLANNING VALT.
 ### Neerslaganimatie
 
 
-Deze loopt over de laatste 24 uur.
+Deze loopt over een vaste periode, bijvoorbeeld de laatste 24 uur en
+komende 24 uur.
 
 De tile is een 256x256 animated GIF die op de server eens in de x
-minuten klaargezet wordt van een vast gebied, die loopt over de
-laatste dag.
+minuten klaargezet wordt van een vast gebied.
 
 De fullscreen versie is een interactieve kaart met radarbeelden en een
-omhuig schuifbare legenda, die ook loopt over de laatste 24 uur. Een
+omhuig schuifbare legenda, die ook loopt over de vaste periode. Een
 tijd onderin in beeld, en een play / pause button.
 
 
