@@ -26,7 +26,11 @@ const config = {
     umdNamedDefine: true
   },
   resolve: {
-    extensions: [".js", ".jsx"]
+    extensions: [".js", ".jsx"],
+    alias: {
+      masonry: "masonry-layout",
+      isotope: "isotope-layout"
+    }
   },
   devServer: {
     hot: true,
@@ -53,7 +57,7 @@ const config = {
       {
         test: /\.js$/,
         loader: "eslint-loader",
-        exclude: /node_modules|ParramattaMobileDashboard/
+        exclude: /node_modules|ParramattaMobileDashboard|LizardApiClient/
       },
       {
         test: /\.(png|jpg|svg|woff|eot|ttf|otf)$/,

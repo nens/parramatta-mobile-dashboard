@@ -1,0 +1,18 @@
+.tilecontentFullscreen {
+    float: left;
+}
+
+.tileHeader {
+    font-size: 24pt;
+    height: 50px;
+}
+
+.tileHeader span {
+    float: right;
+    margin-right: 15px;
+}
+
+.tileMain {
+    background-color: red;
+    height: calc(100% - 50px);
+}

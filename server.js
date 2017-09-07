@@ -15,7 +15,7 @@ var headers;
 // where we are always authenticated using those. If not, then proxy to a local Lizard
 // running on port 8000, where we have to login.
 if (process.env.sso_user) {
-  proxy_server = "https://nxt.staging.lizard.net";
+  proxy_server = "https://parramatta.lizard.net";
   headers = {
     username: process.env.sso_user,
     password: process.env.sso_pass

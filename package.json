@@ -39,7 +39,9 @@
     "chai": "",
     "concurrently": "",
     "css-loader": "",
-    "eslint": "",
+    "express": "",
+    "husky": "",
+    "eslint": "4.6.1",
     "eslint-config-airbnb": "^14.1.0",
     "eslint-config-prettier": "^1.7.0",
     "eslint-loader": "",
@@ -47,8 +49,6 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
-    "express": "",
-    "husky": "",
     "i18next-extract-gettext": "^3.1.3",
     "i18next-parser": "^0.11.1",
     "i18next-resource-store-loader": "^0.1.1",
@@ -64,9 +64,9 @@
     "redux-mock-store": "",
     "style-loader": "",
     "url-loader": "^0.5.8",
-    "webpack": "",
+    "webpack": "2.7.0",
     "webpack-dev-middleware": "",
-    "webpack-dev-server": "",
+    "webpack-dev-server": "2.4.5",
     "webpack-hot-middleware": "",
     "yargs": ""
   },
@@ -94,9 +94,9 @@
     "leaflet": "",
     "lodash": "^4.17.3",
     "moment": "^2.18.1",
-    "prettier": "^1.3.1",
     "prop-types": "^15.5.9",
     "react": "",
+    "react-bootstrap": "",
     "react-custom-scrollbars": "^4.1.2",
     "react-dom": "",
     "react-i18next": "^3.1.0",
@@ -111,6 +111,8 @@
     "redux": "",
     "redux-logger": "^3.0.1",
     "redux-thunk": "^2.1.0",
-    "velocity-react": "^1.3.2"
+    "velocity-react": "^1.3.2",
+    "isotope-layout": "",
+    "masonry": ""
   }
 }

@@ -1,26 +1,36 @@
-import { createStore, applyMiddleware, combineReducers } from "redux";
-import { createLogger } from "redux-logger";
-import thunkMiddleware from "redux-thunk";
-// import reducers from "../reducers/index";
+import { createStore, combineReducers } from "redux";
+import reducers from "../reducers/index";
 
-let createStoreWithMiddleware;
-const logger = createLogger({});
+export const initialUiState = {
+  tileKeys: [],
+  currentTile: null
+};
 
-createStoreWithMiddleware = applyMiddleware(thunkMiddleware, logger)(
-  createStore
-);
+export const initialTilesState = {};
 
-const initialState = {};
+export const initialSessionState = {
+  // Authentication and user information
+  isFetching: false, // Sent a request to bootstrap
+  hasBootstrap: false, // Whether result is in
+  bootstrap: null // Resulting bootstrap object from Lizard API /bootstrap/lizard
+};
+
+export const initialRastersState = {};
+
+const initialState = {
+  ui: initialUiState,
+  rasters: initialRastersState,
+  tiles: initialTilesState
+};
 
 /**
  * Consumer applications may call createStore({}initialState, {}ownReducers) to
  * create a store with Lizard state and application specific state.
  */
-function configureStore(initialState = {}, externalReducers = {}) {
-  // const rootReducer = combineReducers({ ...reducers, ...externalReducers });
-  const rootReducer = combineReducers({});
+function configureStore(initialState = {}) {
+  const rootReducer = combineReducers(reducers);
 
-  return createStoreWithMiddleware(
+  return createStore(
     rootReducer,
     initialState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
