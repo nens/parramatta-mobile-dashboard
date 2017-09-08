@@ -1,6 +1,10 @@
 import { createStore, combineReducers } from "redux";
 import reducers from "../reducers/index";
 
+export const initialAssetsState = {
+  measuringstation: {}
+};
+
 export const initialUiState = {
   tileKeys: [],
   currentTile: null
@@ -18,8 +22,10 @@ export const initialSessionState = {
 export const initialRastersState = {};
 
 const initialState = {
+  assets: initialAssetsState,
   ui: initialUiState,
   rasters: initialRastersState,
+  session: initialSessionState,
   tiles: initialTilesState
 };
 

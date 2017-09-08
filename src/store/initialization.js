@@ -26,10 +26,11 @@ const hardcodedTiles = [
     ]
   },
   {
-    title: "Tile #1",
-    tileType: null,
+    title: "Measuring stations",
+    tileType: "assetsMap",
     imageUrl:
-      "https://geoserver9.lizard.net/geoserver/schiedam/wms?LAYERS=schiedam%3Aschdm_begaanbaarheid&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A3857&BBOX=486957.47731946,6782074.8128298,491037.45989666,6786888.0641652&WIDTH=170&HEIGHT=140"
+      "https://geoserver9.lizard.net/geoserver/schiedam/wms?LAYERS=schiedam%3Aschdm_begaanbaarheid&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A3857&BBOX=486957.47731946,6782074.8128298,491037.45989666,6786888.0641652&WIDTH=170&HEIGHT=140",
+    assetTypes: ["measuringstation"]
   }
 ];
 

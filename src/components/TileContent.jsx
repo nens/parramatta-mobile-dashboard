@@ -5,6 +5,7 @@ import styles from "./TileContent.css";
 
 import { closeTile } from "../actions/TileActions";
 import RasterMap from "./RasterMap";
+import AssetsMap from "./AssetsMap";
 
 class TileContentComponent extends Component {
   render() {
@@ -14,14 +15,12 @@ class TileContentComponent extends Component {
 
     if (tileType === "rasterMap") {
       const bounds = this.props.bootstrap.getBounds();
-      console.log("Bounds:", bounds);
       tileContent = (
-        <RasterMap
-          tile={tile}
-          bounds={this.props.bootstrap.getBounds()}
-          rasters={this.props.rasters}
-        />
+        <RasterMap tile={tile} bounds={bounds} rasters={this.props.rasters} />
       );
+    } else if (tileType === "assetsMap") {
+      const bounds = this.props.bootstrap.getBounds();
+      tileContent = <AssetsMap tile={tile} bounds={bounds} />;
     } else if (!tileType) {
       tileContent = JSON.stringify(tile);
     }
@@ -60,7 +59,8 @@ function mapStateToProps(state) {
   return {
     tiles: state.tiles,
     bootstrap: state.session.bootstrap,
-    rasters: state.rasters
+    rasters: state.rasters,
+    assets: state.assets
   };
 }
 
