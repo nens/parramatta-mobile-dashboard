@@ -8,7 +8,7 @@ import { selectTile, closeTile } from "../actions/";
 
 import styles from "./App.css";
 
-import NewTile from "./NewTile";
+import TileContainer from "./TileContainer";
 
 const MINIMUM_WIDTH_TO_SHOW_POWERPOINT_TILES = 700; //px
 const POWERPOINT_WIDTH = 250; //px
@@ -64,7 +64,7 @@ class AppComponent extends Component {
               </h2>
             </div>
             <div className={styles.picture}>
-              <NewTile
+              <TileContainer
                 key={key}
                 tile={tile}
                 width={this.state.width}
@@ -98,7 +98,7 @@ class AppComponent extends Component {
         </div>
 
         <div id={"tilecontent" + tile.key} className={styles.tileMain}>
-          <NewTile
+          <TileContainer
             tile={tile}
             width={this.state.width}
             height={this.state.height}

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { translate } from "react-i18next";
-import styles from "./TileContent.css";
+import styles from "./TileContainer.css";
 
 import { selectTile } from "../actions/";
 
@@ -10,7 +10,7 @@ import AssetsMap from "./AssetsMap";
 import RasterMap from "./RasterMap";
 import TimeseriesGraph from "./TimeseriesGraph";
 
-class NewTileComponent extends Component {
+class TileContainerComponent extends Component {
   constructor() {
     super();
     this.state = {
@@ -90,5 +90,5 @@ class NewTileComponent extends Component {
   }
 }
 
-const NewTile = connect(null, null)(NewTileComponent);
-export default translate()(NewTile);
+const TileContainer = connect(null, null)(TileContainerComponent);
+export default translate()(TileContainer);
