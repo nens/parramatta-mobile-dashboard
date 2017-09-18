@@ -14,11 +14,14 @@ class AssetsMapComponent extends Component {
     // As it's possible that other maps also got other assets, and we don't show spinners,
     // don't use an isFetching. Means we may do the same request several times, but
     // for now that is OK.
+    console.log("Bootstrap:", this.props.bootstrap);
+    const bounds = this.props.bootstrap.getBounds();
+    console.log("Bounds:", bounds);
     const inBboxFilter = [
-      this.props.bounds._southWest.lng,
-      this.props.bounds._southWest.lat,
-      this.props.bounds._northEast.lng,
-      this.props.bounds._northEast.lat
+      Math.min(bounds._southWest.lng, bounds._northEast.lng),
+      Math.min(bounds._southWest.lat, bounds._northEast.lat),
+      Math.max(bounds._southWest.lng, bounds._northEast.lng),
+      Math.max(bounds._southWest.lat, bounds._northEast.lat)
     ].join(",");
 
     console.log(inBboxFilter);
@@ -61,9 +64,7 @@ class AssetsMapComponent extends Component {
         let marker = (
           <Marker position={[coords[1], coords[0]]}>
             <Popup>
-              <strong>
-                {asset.name}
-              </strong>
+              <strong>{asset.name}</strong>
             </Popup>
           </Marker>
         );
@@ -73,24 +74,35 @@ class AssetsMapComponent extends Component {
 
     console.log("Markers:", markers);
 
+    const key = this.props.tile.key;
+    const small = this.props.isThumb;
+    const boundsForLeaflet = [
+      [-33.87831497192377, 150.9476776123047],
+      [-33.76800155639643, 151.0842590332031]
+    ];
+
     return (
-      <div className={styles.MapComponent} id="MapComponent">
+      <div
+        className={styles.MapComponent}
+        id={"MapComponent" + key + small}
+        style={{ width: this.props.width, height: this.props.height }}
+      >
         <Map
-          ref="mapElement"
-          id="mapElement"
-          bounds={[
-            [
-              this.props.bounds._southWest.lat,
-              this.props.bounds._southWest.lng
-            ],
-            [this.props.bounds._northEast.lat, this.props.bounds._northEast.lng]
-          ]}
+          ref={"MapComponent" + key + small}
+          id={"MapComponent" + key + small}
+          bounds={boundsForLeaflet}
           zoomControl={false}
           className={styles.MapElement}
         >
           <TileLayer
             url="https://{s}.tiles.mapbox.com/v3/nelenschuurmans.iaa98k8k/{z}/{x}/{y}.png"
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+            attribution={
+              small ? (
+                ""
+              ) : (
+                "&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+              )
+            }
           />
           {markers}
         </Map>
@@ -101,6 +113,7 @@ class AssetsMapComponent extends Component {
 
 function mapStateToProps(state) {
   return {
+    bootstrap: state.session.bootstrap,
     assets: state.assets
   };
 }

@@ -21,12 +21,15 @@ export const initialSessionState = {
 
 export const initialRastersState = {};
 
+export const initialTimeseriesState = {};
+
 const initialState = {
   assets: initialAssetsState,
   ui: initialUiState,
   rasters: initialRastersState,
   session: initialSessionState,
-  tiles: initialTilesState
+  tiles: initialTilesState,
+  timeseries: initialTimeseriesState
 };
 
 /**

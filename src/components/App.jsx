@@ -4,11 +4,11 @@ import { translate } from "react-i18next";
 import Isotope from "isotope-layout";
 
 import { loadTiles } from "../store/initialization";
+import { selectTile, closeTile } from "../actions/";
 
 import styles from "./App.css";
 
-import Tile from "./Tile";
-import TileContent from "./TileContent";
+import NewTile from "./NewTile";
 
 const MINIMUM_WIDTH_TO_SHOW_POWERPOINT_TILES = 700; //px
 const POWERPOINT_WIDTH = 250; //px
@@ -47,6 +47,69 @@ class AppComponent extends Component {
     }
   }
 
+  getSmallTiles() {
+    return this.props.tileKeys.map(key => {
+      const tile = this.props.tiles[key];
+
+      return (
+        <div
+          className={styles.repocontainer + " grid-item"}
+          style={{ float: "left" }}
+          key={key}
+        >
+          <div className="repo" onClick={() => this.props.selectTile(key)}>
+            <div className="repo-header" style={{ marginBottom: 5 }}>
+              <h2 className={styles.title}>
+                <a className={styles.repolink}>{tile.title}</a>
+              </h2>
+            </div>
+            <div className={styles.picture}>
+              <NewTile
+                key={key}
+                tile={tile}
+                width={this.state.width}
+                height={this.state.height}
+                closeTile={this.props.closeTile}
+                isThumb={true}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  getLargeTile(tile, isPowerPoint) {
+    let widthStyle = isPowerPoint
+      ? `calc(100% - ${POWERPOINT_WIDTH}px)`
+      : "100%";
+    console.log("widthStyle: ", widthStyle);
+    return (
+      <div
+        className={styles.tilecontentFullscreen}
+        style={{
+          width: widthStyle,
+          height: "100vh"
+        }}
+      >
+        <div className={styles.tileHeader}>
+          <span onClick={this.props.closeTile}>&times;</span>
+          {tile.title}
+        </div>
+
+        <div id={"tilecontent" + tile.key} className={styles.tileMain}>
+          <NewTile
+            tile={tile}
+            width={this.state.width}
+            height={this.state.height}
+            closeTile={this.props.closeTile}
+            isThumb={false}
+          />
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const tileChosen = !!this.props.currentTile;
     const screenIsSmall =
@@ -58,23 +121,16 @@ class AppComponent extends Component {
 
     if (tileChosen && screenIsSmall) {
       // Just show the tile content
-      return (
-        <div id="app" className={styles.fullHeight}>
-          <TileContent
-            tileKey={this.props.currentTile}
-            width={this.state.width}
-          />
-        </div>
-      );
+      const tile = this.props.tiles[this.props.currentTile];
+      console.log("Tile = ", tile);
+      return this.getLargeTile(tile, false);
     } else {
-      let tiles = this.props.tileKeys.map(
-        function(key) {
-          const tile = this.props.tiles[key];
-          return <Tile key={key} tile={tile} />;
-        }.bind(this)
-      );
+      const tiles = this.getSmallTiles();
 
       if (tileChosen) {
+        const tile = this.props.tiles[this.props.currentTile];
+        const largeTile = this.getLargeTile(tile, true);
+
         // Show both ("Powerpoint style")
         return (
           <div id="app" style={{ width: "100%", height: "100vh" }}>
@@ -89,19 +145,14 @@ class AppComponent extends Component {
             >
               {tiles}
             </div>
-            <TileContent
-              tileKey={this.props.currentTile}
-              width={this.state.width - POWERPOINT_WIDTH}
-            />
+            {largeTile}
           </div>
         );
       } else {
         // Show all tiles using Isotope
         return (
           <div id="app">
-            <div id="isotopetiles">
-              {tiles}
-            </div>
+            <div id="isotopetiles">{tiles}</div>
           </div>
         );
       }
@@ -121,7 +172,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     loadTiles: () => loadTiles(dispatch),
-    fetchBootstrap: sessionState => fetchBootstrap(dispatch, sessionState)
+    fetchBootstrap: sessionState => fetchBootstrap(dispatch, sessionState),
+    selectTile: tileKey => dispatch(selectTile(tileKey)),
+    closeTile: () => dispatch(closeTile())
   };
 }
 

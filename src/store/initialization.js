@@ -31,6 +31,18 @@ const hardcodedTiles = [
     imageUrl:
       "https://geoserver9.lizard.net/geoserver/schiedam/wms?LAYERS=schiedam%3Aschdm_begaanbaarheid&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A3857&BBOX=486957.47731946,6782074.8128298,491037.45989666,6786888.0641652&WIDTH=170&HEIGHT=140",
     assetTypes: ["measuringstation"]
+  },
+  {
+    title: "Timeseries",
+    tileType: "timeseriesGraph",
+    period: {
+      type: "relative_to_now",
+      minSeconds: 172800,
+      maxSeconds: 21600
+    },
+    imageUrl:
+      "https://geoserver9.lizard.net/geoserver/schiedam/wms?LAYERS=schiedam%3Aschdm_begaanbaarheid&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A3857&BBOX=486957.47731946,6782074.8128298,491037.45989666,6786888.0641652&WIDTH=170&HEIGHT=140",
+    timeseries: ["48d39158-b98e-4267-bd7e-a73fabec53c9"]
   }
 ];
 

@@ -11,3 +11,5 @@ export const RECEIVE_RASTER = "RECEIVE_RASTER";
 export const REMOVE_RASTER = "REMOVE_RASTER";
 
 export const ADD_ASSET = "ADD_ASSET";
+
+export const ADD_TIMESERIES = "ADD_TIMESERIES";

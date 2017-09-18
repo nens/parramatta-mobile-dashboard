@@ -17,7 +17,6 @@ class RasterMap extends Component {
       this.props.getRaster(raster.uuid);
       return null;
     }
-    console.log("RasterObject:", rasterObject);
 
     let wmsUrl = rasterObject.wms_info.endpoint;
     if (rasterObject.last_value_timestamp) {
@@ -43,26 +42,36 @@ class RasterMap extends Component {
 
   render() {
     const visibleRasters = [];
+    const bounds = this.props.bootstrap.getBounds();
+    const key = this.props.tile.key;
+    const small = this.props.isThumb;
+    const boundsForLeaflet = [
+      [-33.87831497192377, 150.9476776123047],
+      [-33.76800155639643, 151.0842590332031]
+    ];
 
     return (
-      <div className={styles.MapComponent} id="MapComponent">
+      <div
+        className={styles.MapComponent}
+        id={"MapComponent" + key + small}
+        style={{ width: this.props.width, height: this.props.height }}
+      >
         <Map
-          ref="mapElement"
-          id="mapElement"
-          bounds={[
-            [
-              this.props.bounds._southWest.lat,
-              this.props.bounds._southWest.lng
-            ],
-            [this.props.bounds._northEast.lat, this.props.bounds._northEast.lng]
-          ]}
-          onMoveend={this.handlePanOrZoomEnd}
+          ref={"mapElement" + key + small}
+          id={"mapElement" + key + small}
+          bounds={boundsForLeaflet}
           zoomControl={false}
           className={styles.MapElement}
         >
           <TileLayer
             url="https://{s}.tiles.mapbox.com/v3/nelenschuurmans.iaa98k8k/{z}/{x}/{y}.png"
-            attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+            attribution={
+              small ? (
+                ""
+              ) : (
+                "&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+              )
+            }
           />
           {this.props.tile.rasters.map(raster =>
             this.tileLayerForRaster(raster)
@@ -73,10 +82,19 @@ class RasterMap extends Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {
+    bootstrap: state.session.bootstrap,
+    rasters: state.rasters
+  };
+}
+
 function mapDispatchToProps(dispatch) {
   return {
     getRaster: uuid => getRaster(uuid, dispatch)
   };
 }
 
-export default translate()(connect(null, mapDispatchToProps)(RasterMap));
+export default translate()(
+  connect(mapStateToProps, mapDispatchToProps)(RasterMap)
+);
