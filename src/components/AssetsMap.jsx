@@ -14,9 +14,7 @@ class AssetsMapComponent extends Component {
     // As it's possible that other maps also got other assets, and we don't show spinners,
     // don't use an isFetching. Means we may do the same request several times, but
     // for now that is OK.
-    console.log("Bootstrap:", this.props.bootstrap);
     const bounds = this.props.bootstrap.getBounds();
-    console.log("Bounds:", bounds);
     const inBboxFilter = [
       Math.min(bounds._southWest.lng, bounds._northEast.lng),
       Math.min(bounds._southWest.lat, bounds._northEast.lat),
@@ -24,12 +22,9 @@ class AssetsMapComponent extends Component {
       Math.max(bounds._southWest.lat, bounds._northEast.lat)
     ].join(",");
 
-    console.log(inBboxFilter);
-
     this.props.tile.assetTypes.forEach(assetType => {
       // This is really impossible, need something more generic
       if (assetType === "measuringstation") {
-        console.log("It's measuringstation");
         getMeasuringStations({
           in_bbox: inBboxFilter,
           page_size: 1000
@@ -51,16 +46,12 @@ class AssetsMapComponent extends Component {
 
     this.props.tile.assetTypes.forEach(assetType => {
       const assets = this.props.assets[assetType];
-      console.log("Assets 1:", assets);
       if (!assets) {
         return;
       }
-      console.log("Assets 2:", assets);
 
       Object.values(assets).forEach(asset => {
-        console.log("Asset", asset.toString());
         const coords = asset.geometry.coordinates;
-        console.log("Coords:", coords);
         let marker = (
           <Marker position={[coords[1], coords[0]]}>
             <Popup>
@@ -71,8 +62,6 @@ class AssetsMapComponent extends Component {
         markers.push(marker);
       });
     });
-
-    console.log("Markers:", markers);
 
     const key = this.props.tile.key;
     const small = this.props.isThumb;

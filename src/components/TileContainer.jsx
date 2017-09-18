@@ -31,12 +31,10 @@ class TileContainerComponent extends Component {
     // Some trickery to find the size of the element excluding padding, etc
     const thisElement = ReactDOM.findDOMNode(this);
     if (!thisElement) {
-      console.log("DOM node not found");
       return;
     }
     const element = thisElement.parentElement;
     const style = window.getComputedStyle(element, null);
-    console.log("Setting dimensions", style);
     this.setState({
       height: parseInt(style.getPropertyValue("height")),
       width: parseInt(style.getPropertyValue("width"))
@@ -48,12 +46,10 @@ class TileContainerComponent extends Component {
     const tileType = tile.tileType;
 
     if (!this.state.height) {
-      console.log("Not rendering, no height.");
       return <span />;
     }
 
     if (tileType === "rasterMap") {
-      console.log("Rendering raster map");
       return (
         <RasterMap
           tile={tile}
@@ -72,7 +68,6 @@ class TileContainerComponent extends Component {
         />
       );
     } else if (tileType === "timeseriesGraph") {
-      console.log("Rendering timeseries");
       return (
         <TimeseriesGraph
           width={this.state.width}
@@ -82,11 +77,8 @@ class TileContainerComponent extends Component {
         />
       );
     } else if (!tileType) {
-      console.log("Shouldn't get here.");
       return <span>{JSON.stringify(tile)}</span>;
     }
-    console.log("Absolutely shouldn't get here.");
-    return <span>Hmm.</span>;
   }
 }
 

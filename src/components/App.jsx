@@ -83,7 +83,6 @@ class AppComponent extends Component {
     let widthStyle = isPowerPoint
       ? `calc(100% - ${POWERPOINT_WIDTH}px)`
       : "100%";
-    console.log("widthStyle: ", widthStyle);
     return (
       <div
         className={styles.tilecontentFullscreen}
@@ -122,7 +121,6 @@ class AppComponent extends Component {
     if (tileChosen && screenIsSmall) {
       // Just show the tile content
       const tile = this.props.tiles[this.props.currentTile];
-      console.log("Tile = ", tile);
       return this.getLargeTile(tile, false);
     } else {
       const tiles = this.getSmallTiles();

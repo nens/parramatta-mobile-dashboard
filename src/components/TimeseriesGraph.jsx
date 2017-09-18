@@ -21,7 +21,6 @@ class TimeseriesGraphComponent extends Component {
     const result = this.props.tile.timeseries.every(uuid =>
       this.props.timeseries.hasOwnProperty(uuid)
     );
-    console.log("[TSG] allTimeseriesHaveMetadata()", result);
     return result;
   }
 
@@ -31,12 +30,10 @@ class TimeseriesGraphComponent extends Component {
         this.state.eventsPerTimeseries.hasOwnProperty(uuid) &&
         !this.state.eventsPerTimeseries[uuid].fetching
     );
-    console.log("[TSG] allTimeseriesHaveEvents()", result);
     return result;
   }
 
   componentDidMount() {
-    console.log("[TSG] componentDidMount()");
     if (!this.allTimeseriesHaveMetadata()) {
       this.getAllTimeseriesMetadata();
     } else {
@@ -45,7 +42,6 @@ class TimeseriesGraphComponent extends Component {
   }
 
   updateStartEnd() {
-    console.log("[TSG] updateStartEnd()");
     const period = this.props.tile.period;
 
     let startend;
@@ -94,31 +90,24 @@ class TimeseriesGraphComponent extends Component {
   }
 
   componentDidUpdate() {
-    console.log("[TSG] componentDidUpdate()");
     if (!this.allTimeseriesHaveMetadata()) {
-      console.log("--- Not all timeseries have metadata");
       return; // Still waiting for requests
     }
 
     if (!this.state.start || !this.state.end) {
-      console.log("--- Will update start end");
       this.updateStartEnd();
       return;
     }
 
     if (!this.allTimeseriesHaveEvents()) {
-      console.log("--- Update events");
       this.props.tile.timeseries.forEach(uuid => {
         if (this.state.eventsPerTimeseries.hasOwnProperty(uuid)) {
-          console.log("Uuid", uuid, "has events");
           return;
         }
 
         let newEvents = { ...this.state.eventsPerTimeseries };
         newEvents[uuid] = { fetching: true, events: null };
         this.setState({ eventsPerTimeseries: newEvents });
-        console.log("Updating timeseries", uuid);
-        console.log("Width =", this.props.width);
         this.updateTimeseries(uuid, this.state.start, this.state.end, {
           min_points: this.props.width
         });
@@ -127,18 +116,14 @@ class TimeseriesGraphComponent extends Component {
   }
 
   getAllTimeseriesMetadata() {
-    console.log("[TSG] getAllTimeseriesHaveMetadata()");
     const result = this.props.tile.timeseries.forEach(uuid => {
       this.updateTimeseries(uuid, null, null);
     });
-    console.log(result);
     return result;
   }
 
   updateTimeseries(uuid, start, end, params) {
-    console.log("[TSG] updateTimeseries()");
     getTimeseries(uuid, start, end, params).then(results => {
-      console.log("[TSG] receiving timeseries", results);
       if (results && results.length) {
         if (!this.props.timeseries[uuid]) {
           this.props.addTimeseriesToState(uuid, results[0]);
@@ -157,12 +142,9 @@ class TimeseriesGraphComponent extends Component {
   }
 
   render() {
-    console.log("[TSG] render()");
     let uuid = this.props.tile.timeseries[0];
 
     if (this.allTimeseriesHaveMetadata() && this.allTimeseriesHaveEvents()) {
-      console.log("DATA:", this.state.eventsPerTimeseries[uuid].events);
-
       const xaxis = this.props.isThumb ? null : (
         <XAxis dataKey="timestamp" tickFormatter={this.tickFormatter} />
       );
