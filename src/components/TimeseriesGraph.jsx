@@ -6,6 +6,7 @@ import { addTimeseries } from "../actions/TimeseriesActions";
 import { getTimeseries } from "lizard-api-client";
 import { LineChart, XAxis, YAxis, Line } from "recharts";
 import * as d3 from "d3";
+import { MAX_TIMESERIES_POINTS } from "../constants/config";
 
 class TimeseriesGraphComponent extends Component {
   constructor() {
@@ -44,33 +45,34 @@ class TimeseriesGraphComponent extends Component {
   updateStartEnd() {
     const period = this.props.tile.period;
 
-    let startend;
-    if (period.type === "relative_to_now") {
-      startend = this.startEndRelativeToNow(period);
-    } else if (period.type === "all") {
-      startend = this.startEndAll();
+    const startDatetime = period[0];
+    const endDatetime = period[1];
+
+    let startOfTs = null;
+    let endOfTs = null;
+
+    if (startDatetime.needsStartEnd() || endDatetime.needsStartEnd()) {
+      let startendOfTs = this.startEndOfTs();
+      startOfTs = startendOfTs[0];
+      endOfTs = startendOfTs[1];
     }
 
-    const start = startend[0];
-    const end = startend[1];
-    if (start !== this.state.start || end !== this.state.end) {
+    const startTimestamp = startDatetime.asTimestamp(startOfTs, endOfTs);
+    const endTimestamp = endDatetime.asTimestamp(startOfTs, endOfTs);
+
+    if (
+      startTimestamp !== this.state.start ||
+      endTimestamp !== this.state.end
+    ) {
       this.setState({
-        start: start,
-        end: end,
+        start: startTimestamp,
+        end: endTimestamp,
         eventsPerTimeseries: {}
       });
     }
   }
 
-  startEndRelativeToNow(period) {
-    const now = new Date().getTime(); // is UTC
-    return [
-      now - (period.minSeconds || 0) * 1000,
-      now + (period.maxSeconds || 0) * 1000
-    ];
-  }
-
-  startEndAll() {
+  startEndOfTs() {
     // Get minimum start and maximum end of all timeseries
     let start = null;
     let end = null;
@@ -109,7 +111,7 @@ class TimeseriesGraphComponent extends Component {
         newEvents[uuid] = { fetching: true, events: null };
         this.setState({ eventsPerTimeseries: newEvents });
         this.updateTimeseries(uuid, this.state.start, this.state.end, {
-          min_points: this.props.width
+          min_points: Math.min(this.props.width, MAX_TIMESERIES_POINTS)
         });
       });
     }

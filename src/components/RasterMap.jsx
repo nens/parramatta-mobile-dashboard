@@ -1,12 +1,14 @@
-import React, { Component } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import { render } from "react-dom";
 import { translate } from "react-i18next";
 import styles from "./RasterMap.css";
 import { Bounds, Map, TileLayer, WMSTileLayer } from "react-leaflet";
+
+import BaseTile from "./BaseTile";
 import { getRaster } from "../actions/RasterActions";
 
-class RasterMap extends Component {
+class RasterMap extends BaseTile {
   tileLayerForRaster(raster) {
     let rasterObject = null;
     if (this.props.rasters.hasOwnProperty(raster.uuid)) {
@@ -18,15 +20,15 @@ class RasterMap extends Component {
       return null;
     }
 
-    let wmsUrl = rasterObject.wms_info.endpoint;
-    if (rasterObject.last_value_timestamp) {
-      // String of the form '01-01-1970T00:00:00.000Z'
-      let utcTime = new Date(rasterObject.last_value_timestamp).toISOString();
-      // Remove '.000Z'
-      if (utcTime.substring(19, 24) === ".000Z") {
-        utcTime = utcTime.substring(0, 19);
-      }
-      wmsUrl += "?TIME=" + utcTime;
+    let wmsUrl;
+    if (rasterObject.last_value_timestamp && this.props.tile.datetime) {
+      wmsUrl = rasterObject.wms_info.addTimeToEndpoint(
+        this.props.tile.datetime,
+        rasterObject.first_value_timestamp,
+        rasterObject.last_value_timestamp
+      );
+    } else {
+      wmsUrl = rasterObject.wms_info.endpoint;
     }
 
     return (
@@ -42,13 +44,9 @@ class RasterMap extends Component {
 
   render() {
     const visibleRasters = [];
-    const bounds = this.props.bootstrap.getBounds();
     const key = this.props.tile.key;
     const small = this.props.isThumb;
-    const boundsForLeaflet = [
-      [-33.87831497192377, 150.9476776123047],
-      [-33.76800155639643, 151.0842590332031]
-    ];
+    const boundsForLeaflet = this.getBbox().toLeafletArray();
 
     return (
       <div

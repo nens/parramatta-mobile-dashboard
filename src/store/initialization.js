@@ -1,4 +1,6 @@
+import { BoundingBox } from "../util/bounds";
 import { addTile } from "../actions/TileActions";
+import { DateTime } from "lizard-api-client";
 
 const hardcodedTiles = [
   {
@@ -23,7 +25,18 @@ const hardcodedTiles = [
         uuid: "a8472933-0a9d-44c2-b74a-a72614d9be2b",
         opacity: 0.5
       }
-    ]
+    ],
+    bbox: new BoundingBox(
+      149.9476776123047, // westmost
+      -34.87831497192377, // southmost
+      152.0842590332031, // eastmost
+      -32.76800155639643 // northmost
+    ),
+    datetime: new DateTime({
+      type: "relative",
+      to: "end",
+      offset: 3 * 60 * 60 // 3 hours before end of series
+    })
   },
   {
     title: "Measuring stations",
@@ -35,11 +48,18 @@ const hardcodedTiles = [
   {
     title: "Timeseries",
     tileType: "timeseriesGraph",
-    period: {
-      type: "relative_to_now",
-      minSeconds: 172800,
-      maxSeconds: 21600
-    },
+    period: [
+      new DateTime({
+        type: "relative",
+        to: "end",
+        offset: -3 * 24 * 3600
+      }),
+      new DateTime({
+        type: "relative",
+        to: "end",
+        offset: 6 * 3600
+      })
+    ],
     imageUrl:
       "https://geoserver9.lizard.net/geoserver/schiedam/wms?LAYERS=schiedam%3Aschdm_begaanbaarheid&STYLES=&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&SRS=EPSG%3A3857&BBOX=486957.47731946,6782074.8128298,491037.45989666,6786888.0641652&WIDTH=170&HEIGHT=140",
     timeseries: ["48d39158-b98e-4267-bd7e-a73fabec53c9"]

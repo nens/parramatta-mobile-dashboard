@@ -6,21 +6,16 @@ import styles from "./AssetMap.css";
 import { Bounds, Map, TileLayer, Marker, Popup } from "react-leaflet";
 
 import { getMeasuringStations } from "lizard-api-client";
+import BaseTile from "./BaseTile";
 import { addAsset } from "../actions/AssetActions";
 
-class AssetsMapComponent extends Component {
+class AssetsMapComponent extends BaseTile {
   componentDidMount() {
     // Send a request for all assets of the configured types, store them on assets
     // As it's possible that other maps also got other assets, and we don't show spinners,
     // don't use an isFetching. Means we may do the same request several times, but
     // for now that is OK.
-    const bounds = this.props.bootstrap.getBounds();
-    const inBboxFilter = [
-      Math.min(bounds._southWest.lng, bounds._northEast.lng),
-      Math.min(bounds._southWest.lat, bounds._northEast.lat),
-      Math.max(bounds._southWest.lng, bounds._northEast.lng),
-      Math.max(bounds._southWest.lat, bounds._northEast.lat)
-    ].join(",");
+    const inBboxFilter = this.getBbox().toLizardBbox();
 
     this.props.tile.assetTypes.forEach(assetType => {
       // This is really impossible, need something more generic
@@ -52,11 +47,14 @@ class AssetsMapComponent extends Component {
 
       Object.values(assets).forEach(asset => {
         const coords = asset.geometry.coordinates;
+        const popup = this.props.isThumb ? null : (
+          <Popup>
+            <strong>{asset.name}</strong>
+          </Popup>
+        );
         let marker = (
-          <Marker position={[coords[1], coords[0]]}>
-            <Popup>
-              <strong>{asset.name}</strong>
-            </Popup>
+          <Marker position={[coords[1], coords[0]]} key={asset.id}>
+            {popup}
           </Marker>
         );
         markers.push(marker);
@@ -65,10 +63,7 @@ class AssetsMapComponent extends Component {
 
     const key = this.props.tile.key;
     const small = this.props.isThumb;
-    const boundsForLeaflet = [
-      [-33.87831497192377, 150.9476776123047],
-      [-33.76800155639643, 151.0842590332031]
-    ];
+    const boundsForLeaflet = this.getBbox().toLeafletArray();
 
     return (
       <div
