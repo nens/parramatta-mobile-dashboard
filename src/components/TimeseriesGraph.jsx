@@ -4,7 +4,7 @@ import moment from "moment";
 import { translate } from "react-i18next";
 import { addTimeseries } from "../actions/TimeseriesActions";
 import { getTimeseries } from "lizard-api-client";
-import { LineChart, XAxis, YAxis, Line } from "recharts";
+import { Legend, LineChart, XAxis, YAxis, Line } from "recharts";
 import * as d3 from "d3";
 import { MAX_TIMESERIES_POINTS } from "../constants/config";
 
@@ -152,7 +152,9 @@ class TimeseriesGraphComponent extends Component {
       );
       const yaxis = this.props.isThumb ? null : <YAxis />;
       const margin = this.props.isThumb ? 5 : 15;
-
+      const legend = this.props.isThumb ? null : (
+        <Legend verticalAlign="bottom" height={36} />
+      );
       return (
         <LineChart
           width={this.props.width - margin}
@@ -167,7 +169,15 @@ class TimeseriesGraphComponent extends Component {
         >
           {xaxis}
           {yaxis}
-          <Line type="monotone" dataKey="value" stroke="#00f" />
+          <Line
+            name={this.props.timeseries[
+              uuid
+            ].observation_type.getLegendString()}
+            type="monotone"
+            dataKey="value"
+            stroke="#00f"
+          />
+          {legend}
         </LineChart>
       );
     } else {
