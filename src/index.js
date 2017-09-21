@@ -4,7 +4,8 @@ import { I18nextProvider } from "react-i18next";
 import { Provider } from "react-redux";
 import { theStore } from "./store/Store";
 
-import App from "./components/App";
+import { TermsOrLoginOrApp } from "./components/TermsOrLoginOrApp";
+
 import i18n from "./i18n"; // initialized i18next instance
 import React from "react";
 import ReactDOM from "react-dom";
@@ -21,7 +22,7 @@ ReactDOM.render(
       <Provider store={theStore}>
         <Router basename="/">
           <div>
-            <Route exact path="/" component={App} />
+            <Route exact path="/" component={TermsOrLoginOrApp} />
           </div>
         </Router>
       </Provider>

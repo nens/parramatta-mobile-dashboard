@@ -13,8 +13,6 @@ import TileContainer from "./TileContainer";
 const MINIMUM_WIDTH_TO_SHOW_POWERPOINT_TILES = 700; //px
 const POWERPOINT_WIDTH = 250; //px
 
-import { fetchBootstrap } from "../actions/";
-
 class AppComponent extends Component {
   constructor(props) {
     super(props);
@@ -35,7 +33,6 @@ class AppComponent extends Component {
   }
 
   componentDidMount() {
-    this.props.fetchBootstrap(this.props.sessionState);
     this.props.loadTiles();
 
     window.addEventListener("resize", this.updateDimensions.bind(this));
@@ -53,7 +50,7 @@ class AppComponent extends Component {
       session &&
       session.hasBootstrap &&
       session.bootstrap &&
-      session.authenticated
+      session.bootstrap.authenticated
     );
   }
 
@@ -61,7 +58,7 @@ class AppComponent extends Component {
     console.log("Will receive:", newprops);
     if (newprops.sessionState.hasBootstrap) {
       if (!this.canShowTiles(newprops)) {
-        newprops.sessionState.bootstrap.doLogin();
+        //newprops.sessionState.bootstrap.doLogin();
       } else {
         console.log("LOGGED IN", newprops);
       }
