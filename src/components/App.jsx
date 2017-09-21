@@ -47,6 +47,27 @@ class AppComponent extends Component {
     }
   }
 
+  canShowTiles(props) {
+    const session = props.sessionState;
+    return (
+      session &&
+      session.hasBootstrap &&
+      session.bootstrap &&
+      session.authenticated
+    );
+  }
+
+  componentWillReceiveProps(newprops) {
+    console.log("Will receive:", newprops);
+    if (newprops.sessionState.hasBootstrap) {
+      if (!this.canShowTiles(newprops)) {
+        newprops.sessionState.bootstrap.doLogin();
+      } else {
+        console.log("LOGGED IN", newprops);
+      }
+    }
+  }
+
   getSmallTiles() {
     return this.props.tileKeys.map(key => {
       const tile = this.props.tiles[key];
@@ -114,7 +135,7 @@ class AppComponent extends Component {
     const screenIsSmall =
       this.state.width < MINIMUM_WIDTH_TO_SHOW_POWERPOINT_TILES;
 
-    if (!this.props.sessionState.hasBootstrap) {
+    if (!this.canShowTiles(this.props)) {
       return <p>Waiting for session information...</p>;
     }
 

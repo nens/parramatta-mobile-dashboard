@@ -14,12 +14,16 @@ var headers;
 // If we use sso_user and sso_pass environment variables, then proxy to Lizard staging
 // where we are always authenticated using those. If not, then proxy to a local Lizard
 // running on port 8000, where we have to login.
-if (process.env.sso_user) {
+if (process.env.sso_user || true) {
   proxy_server = "https://parramatta.lizard.net";
-  headers = {
-    username: process.env.sso_user,
-    password: process.env.sso_pass
-  };
+  if (process.env.sso_user) {
+    headers = {
+      username: process.env.sso_user,
+      password: process.env.sso_pass
+    };
+  } else {
+    headers = {};
+  }
 } else {
   proxy_server = "http://localhost:8000";
   headers = {};
