@@ -8,6 +8,7 @@ import { Bounds, Map, TileLayer, Marker, Popup } from "react-leaflet";
 import { getMeasuringStations } from "lizard-api-client";
 import BaseTile from "./BaseTile";
 import { addAsset } from "../actions/AssetActions";
+import { updateTimeseriesMetadata } from "../actions/TimeseriesActions";
 
 class AssetsMapComponent extends BaseTile {
   componentDidMount() {
@@ -36,6 +37,57 @@ class AssetsMapComponent extends BaseTile {
     });
   }
 
+  getPopup(asset) {
+    if (this.props.isThumb) return null;
+
+    let timeseriesTable;
+
+    if (!asset.timeseries || !asset.timeseries.length) {
+      timeseriesTable = <p>This asset has no timeseries.</p>;
+    } else {
+      const timeseriesWithMetadata = asset.timeseries.filter(
+        ts => this.props.timeseriesMetadata[ts.uuid]
+      );
+
+      if (timeseriesWithMetadata.length) {
+        // Create a table with units and latest values.
+        const rows = timeseriesWithMetadata.map(ts => {
+          const metadata = this.props.timeseriesMetadata[ts.uuid];
+          return (
+            <tr>
+              <td>{metadata.name}</td>
+              <td>{metadata.last_value}</td>
+              <td>{metadata.observation_type.unit || ""}</td>
+            </tr>
+          );
+        });
+        timeseriesTable = (
+          <table className={styles.PopupTable}>
+            <thead>
+              <th>Timeseries name</th>
+              <th>Last value</th>
+              <th>Unit</th>
+            </thead>
+            {rows}
+          </table>
+        );
+      } else {
+        timeseriesTable = <p>Loading timeseries...</p>;
+      }
+    }
+
+    return (
+      <Popup>
+        <div className={styles.Popup}>
+          <p>
+            <strong>{asset.name}</strong>
+          </p>
+          {timeseriesTable}
+        </div>
+      </Popup>
+    );
+  }
+
   render() {
     let markers = [];
 
@@ -47,14 +99,14 @@ class AssetsMapComponent extends BaseTile {
 
       Object.values(assets).forEach(asset => {
         const coords = asset.geometry.coordinates;
-        const popup = this.props.isThumb ? null : (
-          <Popup>
-            <strong>{asset.name}</strong>
-          </Popup>
-        );
         let marker = (
-          <Marker position={[coords[1], coords[0]]} key={asset.id}>
-            {popup}
+          <Marker
+            onclick={() =>
+              !this.props.isThumb && this.clickMarker(assetType, asset.id)}
+            position={[coords[1], coords[0]]}
+            key={asset.id}
+          >
+            {this.getPopup(asset)}
           </Marker>
         );
         markers.push(marker);
@@ -93,19 +145,30 @@ class AssetsMapComponent extends BaseTile {
       </div>
     );
   }
+
+  clickMarker(assetType, assetId) {
+    const asset = this.props.assets[assetType][assetId];
+
+    if (!asset.timeseries) return;
+
+    asset.timeseries.forEach(this.props.updateTimeseries);
+  }
 }
 
 function mapStateToProps(state) {
   return {
     bootstrap: state.session.bootstrap,
-    assets: state.assets
+    assets: state.assets,
+    timeseriesMetadata: state.timeseries
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     addAsset: (assetType, id, instance) =>
-      dispatch(addAsset(assetType, id, instance))
+      dispatch(addAsset(assetType, id, instance)),
+    updateTimeseries: timeseries =>
+      updateTimeseriesMetadata(dispatch, timeseries.uuid)
   };
 }
 

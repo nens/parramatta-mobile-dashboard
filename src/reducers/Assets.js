@@ -11,7 +11,6 @@ export default function(state = initialAssetsState, action) {
       const newAssetsOfType = { ...newAssets[action.assetType] };
       newAssetsOfType[action.id] = action.instance;
       newAssets[action.assetType] = newAssetsOfType;
-      console.log("STATE:", newAssets);
       return newAssets;
     default:
       return state;

@@ -44,27 +44,6 @@ class AppComponent extends Component {
     }
   }
 
-  canShowTiles(props) {
-    const session = props.sessionState;
-    return (
-      session &&
-      session.hasBootstrap &&
-      session.bootstrap &&
-      session.bootstrap.authenticated
-    );
-  }
-
-  componentWillReceiveProps(newprops) {
-    console.log("Will receive:", newprops);
-    if (newprops.sessionState.hasBootstrap) {
-      if (!this.canShowTiles(newprops)) {
-        //newprops.sessionState.bootstrap.doLogin();
-      } else {
-        console.log("LOGGED IN", newprops);
-      }
-    }
-  }
-
   getSmallTiles() {
     return this.props.tileKeys.map(key => {
       const tile = this.props.tiles[key];
@@ -132,10 +111,6 @@ class AppComponent extends Component {
     const screenIsSmall =
       this.state.width < MINIMUM_WIDTH_TO_SHOW_POWERPOINT_TILES;
 
-    if (!this.canShowTiles(this.props)) {
-      return <p>Waiting for session information...</p>;
-    }
-
     if (tileChosen && screenIsSmall) {
       // Just show the tile content
       const tile = this.props.tiles[this.props.currentTile];
@@ -180,15 +155,13 @@ function mapStateToProps(state) {
   return {
     tiles: state.tiles,
     tileKeys: state.ui.tileKeys,
-    currentTile: state.ui.currentTile,
-    sessionState: state.session
+    currentTile: state.ui.currentTile
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     loadTiles: () => loadTiles(dispatch),
-    fetchBootstrap: sessionState => fetchBootstrap(dispatch, sessionState),
     selectTile: tileKey => dispatch(selectTile(tileKey)),
     closeTile: () => dispatch(closeTile())
   };

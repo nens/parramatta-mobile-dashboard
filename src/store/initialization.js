@@ -46,7 +46,7 @@ const hardcodedTiles = [
       new DateTime({
         type: "relative",
         to: "end",
-        offset: -3 * 24 * 3600
+        offset: -5 * 24 * 3600
       }),
       new DateTime({
         type: "relative",
@@ -62,7 +62,6 @@ export function loadTiles(dispatch) {
   hardcodedTiles.map((tile, i) => {
     const key = "tile" + i;
     tile.key = key;
-    console.log("Tile:", tile);
     dispatch(addTile(key, tile));
   });
 }

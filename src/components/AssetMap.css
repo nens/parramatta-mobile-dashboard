@@ -6,3 +6,18 @@
 .MapElement {
   height: 100%;
 }
+
+.Popup {
+    min-width: 300px;
+}
+
+.PopupTable, .PopupTable th, .PopupTable td {
+    border-collapse: collapse;
+    border: solid #ccc 1px;
+    padding: 5px;
+}
+
+.PopupTable thead {
+    color: white;
+    background-color: #666;
+}

@@ -124,6 +124,10 @@ class TimeseriesGraphComponent extends Component {
     return result;
   }
 
+  tickFormatter(tick) {
+    return moment(tick).format("DD/MM/YY");
+  }
+
   updateTimeseries(uuid, start, end, params) {
     getTimeseries(uuid, start, end, params).then(results => {
       if (results && results.length) {
@@ -137,10 +141,6 @@ class TimeseriesGraphComponent extends Component {
         }
       }
     });
-  }
-
-  tickFormatter(tick) {
-    return moment(tick).format("DD/MM/YY");
   }
 
   render() {
