@@ -46,7 +46,7 @@ const hardcodedTiles = [
       new DateTime({
         type: "relative",
         to: "end",
-        offset: -5 * 24 * 3600
+        offset: -3 * 24 * 3600
       }),
       new DateTime({
         type: "relative",
@@ -54,7 +54,10 @@ const hardcodedTiles = [
         offset: 6 * 3600
       })
     ],
-    timeseries: ["48d39158-b98e-4267-bd7e-a73fabec53c9"]
+    timeseries: [
+      "34b144a0-7849-4e3f-aaa8-b0fffc86abbf",
+      "48d39158-b98e-4267-bd7e-a73fabec53c9"
+    ]
   }
 ];
 

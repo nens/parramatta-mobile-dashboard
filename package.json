@@ -88,6 +88,8 @@
   "homepage": "https://github.com/nens/parramatta-mobile-dashboard",
   "dependencies": {
     "d3": "",
+    "d3-scale": "",
+    "d3-time": "",
     "es6-promise": "^4.0.5",
     "i18next": "^8.1.0",
     "i18next-browser-languagedetector": "^1.0.1",

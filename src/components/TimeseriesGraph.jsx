@@ -4,9 +4,49 @@ import moment from "moment";
 import { translate } from "react-i18next";
 import { addTimeseries } from "../actions/TimeseriesActions";
 import { getTimeseries } from "lizard-api-client";
-import { Legend, LineChart, XAxis, YAxis, Line } from "recharts";
+import {
+  CartesianGrid,
+  Legend,
+  ComposedChart,
+  XAxis,
+  YAxis,
+  Line,
+  Bar
+} from "recharts";
 import * as d3 from "d3";
+import { scaleTime } from "d3-scale";
+import { minute } from "d3-time";
 import { MAX_TIMESERIES_POINTS } from "../constants/config";
+import findIndex from "lodash/findIndex";
+
+function combineEventSeries(series) {
+  // Events has the form [{uuid: uuid1, events: [events1]}, ...]
+  //
+  // Return a sorted array of the form
+  // [{timestamp: timestamp, uuid1: value1, uuid2: value}}]
+
+  let events = {}; // {timestamp: {uuid1: value1}}
+
+  series.forEach(serie =>
+    serie.events.forEach((event, idx) => {
+      const timestamp = event.timestamp;
+      if (!events.hasOwnProperty(timestamp)) {
+        events[timestamp] = {};
+      }
+      events[timestamp][serie.uuid] = event.value;
+    })
+  );
+
+  let timestamps = Object.keys(events)
+    .map(parseFloat)
+    .sort();
+
+  return timestamps.map(timestamp => {
+    const values = events[timestamp];
+    values.timestamp = timestamp;
+    return values;
+  });
+}
 
 class TimeseriesGraphComponent extends Component {
   constructor() {
@@ -72,6 +112,17 @@ class TimeseriesGraphComponent extends Component {
     }
   }
 
+  getTicks() {
+    // Calculate ticks using d3_scale.scaleTime.
+    const domain = [new Date(this.state.start), new Date(this.state.end)];
+    const scale = scaleTime()
+      .domain(domain)
+      .range([0, 1]);
+    const ticks = scale.ticks(minute, 5);
+
+    return ticks.map(entry => entry.getTime());
+  }
+
   startEndOfTs() {
     // Get minimum start and maximum end of all timeseries
     let start = null;
@@ -125,7 +176,7 @@ class TimeseriesGraphComponent extends Component {
   }
 
   tickFormatter(tick) {
-    return moment(tick).format("DD/MM/YY");
+    return moment(tick).format(" HH:mm");
   }
 
   updateTimeseries(uuid, start, end, params) {
@@ -143,46 +194,153 @@ class TimeseriesGraphComponent extends Component {
     });
   }
 
-  render() {
-    let uuid = this.props.tile.timeseries[0];
+  axisLabel(observationType) {
+    return (
+      (observationType.unit || "") + (observationType.reference_frame || "")
+    );
+  }
 
-    if (this.allTimeseriesHaveMetadata() && this.allTimeseriesHaveEvents()) {
-      const xaxis = this.props.isThumb ? null : (
-        <XAxis dataKey="timestamp" tickFormatter={this.tickFormatter} />
-      );
-      const yaxis = this.props.isThumb ? null : <YAxis />;
-      const margin = this.props.isThumb ? 5 : 15;
-      const legend = this.props.isThumb ? null : (
-        <Legend verticalAlign="bottom" height={36} />
-      );
+  observationType(uuid) {
+    return this.props.timeseries[uuid].observation_type;
+  }
+
+  indexForType(axes, observationType) {
+    return findIndex(
+      axes,
+      ax =>
+        this.axisLabel(ax) === this.axisLabel(observationType) &&
+        ax.scale === observationType.scale
+    );
+  }
+
+  getAxesData() {
+    const axes = [];
+
+    this.props.tile.timeseries.forEach(uuid => {
+      const observationType = this.observationType(uuid);
+      const axis = this.indexForType(axes, observationType);
+
+      if (axis === -1) {
+        if (axes.length >= 2) {
+          console.error(
+            "Can't have a third Y axis for timeseries: ",
+            uuid,
+            " have:",
+            axes
+          );
+          return axes;
+        }
+        axes.push(observationType);
+      }
+    });
+
+    return axes;
+  }
+
+  getYAxes(axes) {
+    return axes.map((axis, idx) => {
       return (
-        <LineChart
-          width={this.props.width - margin}
-          height={this.props.height - margin}
-          data={this.state.eventsPerTimeseries[uuid].events}
-          margin={{
-            top: margin,
-            bottom: margin,
-            left: 2 * margin,
-            right: 2 * margin
-          }}
-        >
-          {xaxis}
-          {yaxis}
-          <Line
-            name={this.props.timeseries[
-              uuid
-            ].observation_type.getLegendString()}
-            type="monotone"
-            dataKey="value"
-            stroke="#00f"
-          />
-          {legend}
-        </LineChart>
+        <YAxis
+          key={idx}
+          yAxisId={idx}
+          orientation={["left", "right"][idx]}
+          domain={[0, "auto"]}
+          label={this.axisLabel(axis)}
+        />
       );
-    } else {
-      return <span>No timeseries.</span>;
+    });
+  }
+
+  getLinesAndBars(axes) {
+    return this.props.tile.timeseries.map((uuid, idx) => {
+      const observationType = this.observationType(uuid);
+      const axisIndex = this.indexForType(axes, observationType);
+
+      if (observationType.scale === "interval") {
+        return (
+          <Line
+            key={uuid}
+            yAxisId={axisIndex}
+            connectNulls={true}
+            name={observationType.getLegendString()}
+            type="monotone"
+            dataKey={uuid}
+            stroke={["#00f", "#0f0", "#f00"][idx % 3]}
+          />
+        );
+      } else if (observationType.scale === "ratio") {
+        return (
+          <Bar
+            key={uuid}
+            yAxisId={axisIndex}
+            name={observationType.getLegendString()}
+            barSize={20}
+            dataKey={uuid}
+            fill={["#00f", "#0f0", "#f00"][idx % 3]}
+          />
+        );
+      }
+    });
+  }
+
+  render() {
+    if (!this.allTimeseriesHaveMetadata() || !this.allTimeseriesHaveEvents()) {
+      return null;
     }
+
+    const combinedEvents = combineEventSeries(
+      this.props.tile.timeseries.map(uuid => {
+        return {
+          uuid: uuid,
+          events: this.state.eventsPerTimeseries[uuid].events
+        };
+      })
+    );
+
+    const axes = this.getAxesData();
+
+    const grid = this.props.isThumb ? null : (
+      <CartesianGrid strokeDasharray="3 3" />
+    );
+
+    const xaxis = this.props.isThumb ? null : (
+      <XAxis
+        dataKey="timestamp"
+        type="number"
+        domain={[this.state.start, this.state.end]}
+        ticks={this.getTicks()}
+        tickFormatter={this.tickFormatter}
+      />
+    );
+
+    const yaxes = this.props.isThumb ? null : this.getYAxes(axes);
+
+    const margin = this.props.isThumb ? 5 : 20;
+    const legend = this.props.isThumb ? null : (
+      <Legend verticalAlign="bottom" height={36} />
+    );
+
+    const lines = this.getLinesAndBars(axes);
+
+    return (
+      <ComposedChart
+        width={this.props.width - margin}
+        height={this.props.height - margin}
+        data={combinedEvents}
+        margin={{
+          top: margin,
+          bottom: margin,
+          left: 2 * margin,
+          right: 2 * margin
+        }}
+      >
+        {grid}
+        {lines}
+        {xaxis}
+        {yaxes}
+        {legend}
+      </ComposedChart>
+    );
   }
 }
 
