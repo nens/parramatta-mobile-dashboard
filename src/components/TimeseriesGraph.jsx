@@ -244,8 +244,9 @@ class TimeseriesGraphComponent extends Component {
           key={idx}
           yAxisId={idx}
           orientation={["left", "right"][idx]}
-          domain={[0, "auto"]}
+          domain={[axis.scale === "ratio" ? 0 : "auto", "auto"]}
           label={this.axisLabel(axis)}
+          hide={this.props.isThumb}
         />
       );
     });
@@ -303,17 +304,18 @@ class TimeseriesGraphComponent extends Component {
       <CartesianGrid strokeDasharray="3 3" />
     );
 
-    const xaxis = this.props.isThumb ? null : (
+    const xaxis = (
       <XAxis
         dataKey="timestamp"
         type="number"
         domain={[this.state.start, this.state.end]}
         ticks={this.getTicks()}
         tickFormatter={this.tickFormatter}
+        hide={this.props.isThumb}
       />
     );
 
-    const yaxes = this.props.isThumb ? null : this.getYAxes(axes);
+    const yaxes = this.getYAxes(axes);
 
     const margin = this.props.isThumb ? 5 : 20;
     const legend = this.props.isThumb ? null : (
