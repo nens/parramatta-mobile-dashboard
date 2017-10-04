@@ -1,0 +1,8 @@
+.legend {
+  position: absolute;
+  bottom: 5px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  border: solid black 1px;
+}

@@ -1,4 +1,5 @@
 import assets from "./Assets";
+import legends from "./Legends";
 import session from "./Session";
 import tiles from "./Tiles";
 import ui from "./Ui";
@@ -11,5 +12,6 @@ export default {
   tiles,
   ui,
   rasters,
-  timeseries
+  timeseries,
+  legends
 };

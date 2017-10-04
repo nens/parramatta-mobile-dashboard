@@ -6,6 +6,8 @@ import styles from "./RasterMap.css";
 import { Bounds, Map, TileLayer, WMSTileLayer } from "react-leaflet";
 
 import BaseTile from "./BaseTile";
+import Legend from "./Legend";
+
 import { getRaster } from "../actions/RasterActions";
 
 class RasterMap extends BaseTile {
@@ -42,6 +44,27 @@ class RasterMap extends BaseTile {
     );
   }
 
+  getLegend() {
+    if (this.props.isThumb) return null;
+
+    const rasterUuid = this.props.tile.rasters[0].uuid;
+
+    if (!this.props.rasters[rasterUuid] || !this.props.rasters[rasterUuid].data)
+      return null;
+
+    const raster = this.props.rasters[rasterUuid].data;
+
+    return (
+      <Legend
+        uuid={rasterUuid}
+        title={raster.name}
+        wmsInfo={raster.wms_info}
+        observationType={raster.observation_type}
+        styles={raster.options.styles}
+      />
+    );
+  }
+
   render() {
     const visibleRasters = [];
     const key = this.props.tile.key;
@@ -49,32 +72,39 @@ class RasterMap extends BaseTile {
     const boundsForLeaflet = this.getBbox().toLeafletArray();
 
     return (
-      <div
-        className={styles.MapComponent}
-        id={"MapComponent" + key + small}
-        style={{ width: this.props.width, height: this.props.height }}
-      >
-        <Map
-          ref={"mapElement" + key + small}
-          id={"mapElement" + key + small}
-          bounds={boundsForLeaflet}
-          zoomControl={false}
-          className={styles.MapElement}
+      <div style={{ width: this.props.width, height: this.props.height }}>
+        <div
+          className={styles.MapComponent}
+          id={"MapComponent" + key + small}
+          style={{
+            float: "left",
+            width: this.props.width,
+            height: this.props.height
+          }}
         >
-          <TileLayer
-            url="https://{s}.tiles.mapbox.com/v3/nelenschuurmans.iaa98k8k/{z}/{x}/{y}.png"
-            attribution={
-              small ? (
-                ""
-              ) : (
-                "&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-              )
-            }
-          />
-          {this.props.tile.rasters.map(raster =>
-            this.tileLayerForRaster(raster)
-          )}
-        </Map>
+          <Map
+            ref={"mapElement" + key + small}
+            id={"mapElement" + key + small}
+            bounds={boundsForLeaflet}
+            zoomControl={false}
+            className={styles.MapElement}
+          >
+            <TileLayer
+              url="https://{s}.tiles.mapbox.com/v3/nelenschuurmans.iaa98k8k/{z}/{x}/{y}.png"
+              attribution={
+                small ? (
+                  ""
+                ) : (
+                  "&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+                )
+              }
+            />
+            {this.props.tile.rasters.map(raster =>
+              this.tileLayerForRaster(raster)
+            )}
+          </Map>
+          {this.getLegend()}
+        </div>
       </div>
     );
   }

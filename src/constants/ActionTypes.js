@@ -13,3 +13,6 @@ export const REMOVE_RASTER = "REMOVE_RASTER";
 export const ADD_ASSET = "ADD_ASSET";
 
 export const ADD_TIMESERIES = "ADD_TIMESERIES";
+
+export const FETCH_LEGEND = "FETCH_LEGEND";
+export const ADD_LEGEND = "ADD_LEGEND";

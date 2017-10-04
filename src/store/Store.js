@@ -23,13 +23,20 @@ export const initialRastersState = {};
 
 export const initialTimeseriesState = {};
 
+// rasterUuid => {
+//   isFetching: false, legendData: null
+// }
+// no different numbers of steps or scaling
+export const initialLegendsState = {};
+
 const initialState = {
   assets: initialAssetsState,
   ui: initialUiState,
   rasters: initialRastersState,
   session: initialSessionState,
   tiles: initialTilesState,
-  timeseries: initialTimeseriesState
+  timeseries: initialTimeseriesState,
+  legends: initialLegendsState
 };
 
 /**
