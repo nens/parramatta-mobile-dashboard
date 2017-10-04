@@ -9,22 +9,22 @@ import { getRasterDetail } from "lizard-api-client";
 export const fetchRaster = uuid => {
   return {
     type: FETCH_RASTER,
-    uuid
+    uuid: uuid
   };
 };
 
 const receiveRaster = (uuid, data) => {
   return {
     type: RECEIVE_RASTER,
-    uuid,
-    data
+    uuid: uuid,
+    data: data
   };
 };
 
 export const removeRaster = uuid => {
   return {
     type: REMOVE_RASTER,
-    uuid
+    uuid: uuid
   };
 };
 

@@ -51,10 +51,10 @@ class AssetsMapComponent extends BaseTile {
 
       if (timeseriesWithMetadata.length) {
         // Create a table with units and latest values.
-        const rows = timeseriesWithMetadata.map(ts => {
+        const rows = timeseriesWithMetadata.map((ts, idx) => {
           const metadata = this.props.timeseriesMetadata[ts.uuid];
           return (
-            <tr>
+            <tr key={idx}>
               <td>{metadata.name}</td>
               <td>{metadata.last_value}</td>
               <td>{metadata.observation_type.unit || ""}</td>
@@ -64,9 +64,9 @@ class AssetsMapComponent extends BaseTile {
         timeseriesTable = (
           <table className={styles.PopupTable}>
             <thead>
-              <th>Timeseries name</th>
-              <th>Last value</th>
-              <th>Unit</th>
+              <td>Timeseries name</td>
+              <td>Last value</td>
+              <td>Unit</td>
             </thead>
             {rows}
           </table>
@@ -97,7 +97,7 @@ class AssetsMapComponent extends BaseTile {
         return;
       }
 
-      Object.values(assets).forEach(asset => {
+      Object.values(assets).forEach((asset, idx) => {
         const coords = asset.geometry.coordinates;
         let marker = (
           <Marker
