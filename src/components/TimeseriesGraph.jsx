@@ -8,8 +8,10 @@ import {
   CartesianGrid,
   Legend,
   ComposedChart,
+  ReferenceLine,
   XAxis,
   YAxis,
+  Tooltip,
   Line,
   Bar
 } from "recharts";
@@ -27,15 +29,17 @@ function combineEventSeries(series) {
 
   let events = {}; // {timestamp: {uuid1: value1}}
 
-  series.forEach(serie =>
+  series.forEach(serie => {
+    console.log(JSON.stringify(serie));
+    const isRatio = serie.timeseries.observation_type.scale === "ratio";
     serie.events.forEach((event, idx) => {
       const timestamp = event.timestamp;
       if (!events.hasOwnProperty(timestamp)) {
         events[timestamp] = {};
       }
-      events[timestamp][serie.uuid] = event.value;
-    })
-  );
+      events[timestamp][serie.uuid] = isRatio ? event.sum : event.max;
+    });
+  });
 
   let timestamps = Object.keys(events)
     .map(parseFloat)
@@ -161,9 +165,15 @@ class TimeseriesGraphComponent extends Component {
         let newEvents = { ...this.state.eventsPerTimeseries };
         newEvents[uuid] = { fetching: true, events: null };
         this.setState({ eventsPerTimeseries: newEvents });
-        this.updateTimeseries(uuid, this.state.start, this.state.end, {
-          min_points: Math.min(this.props.width, MAX_TIMESERIES_POINTS)
-        });
+
+        const params = {
+          window: "hour"
+        };
+
+        if (this.props.timeseries[uuid].observation_type.scale === "ratio") {
+          params.fields = "sum";
+        }
+        this.updateTimeseries(uuid, this.state.start, this.state.end, params);
       });
     }
   }
@@ -266,7 +276,7 @@ class TimeseriesGraphComponent extends Component {
             name={observationType.getLegendString()}
             type="monotone"
             dataKey={uuid}
-            stroke={["#00f", "#0f0", "#f00"][idx % 3]}
+            stroke={["#00f", "#000058", "#99f"][idx % 3]}
           />
         );
       } else if (observationType.scale === "ratio") {
@@ -277,7 +287,7 @@ class TimeseriesGraphComponent extends Component {
             name={observationType.getLegendString()}
             barSize={20}
             dataKey={uuid}
-            fill={["#00f", "#0f0", "#f00"][idx % 3]}
+            fill={["#00f", "#000058", "#99f"][idx % 3]}
           />
         );
       }
@@ -293,6 +303,7 @@ class TimeseriesGraphComponent extends Component {
       this.props.tile.timeseries.map(uuid => {
         return {
           uuid: uuid,
+          timeseries: this.props.timeseries[uuid],
           events: this.state.eventsPerTimeseries[uuid].events
         };
       })
@@ -341,6 +352,8 @@ class TimeseriesGraphComponent extends Component {
         {xaxis}
         {yaxes}
         {legend}
+        <ReferenceLine x={new Date().getTime()} stroke="black" label="Now" />
+        <Tooltip />
       </ComposedChart>
     );
   }
